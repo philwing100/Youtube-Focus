@@ -1,0 +1,57 @@
+// ==UserScript==
+// @name         Youtube Focus
+// @namespace    http://tampermonkey.net/
+// @version      1.5
+// @description  When a youtube video has played for 60 seconds pause it and ask the user if this is a good use of their time.
+// @author       philwing100
+// @match *://*.youtube.com/*
+// @exclude *://*.youtube.com/*playlist=yes*
+// @exclude *://*.youtube.com/
+// @grant none
+// ==/UserScript==
+
+(function() {
+  'use strict';
+
+  // Wait for the page to load
+  window.addEventListener('load', function() {
+/*    // Check if the playlist parameter exists in the query string
+    var params = new URLSearchParams(location.search);
+    if (params.has('playlist')) {
+      // Get the value of the playlist parameter
+      var playlist = params.get('playlist');
+      // Exclude videos in the "Yes" playlist
+      if (playlist === 'yes') {
+        return;
+      }
+    }
+*/
+      // Get the video element
+    var video = document.querySelector('video');
+
+    // Set up a flag variable to keep track of the prompt
+    var promptDisplayed = false;
+
+    // Add an event listener to check the elapsed time of the video
+    video.addEventListener('timeupdate', function() {
+      // Check if the elapsed time of the video is within a certain range and the prompt has not yet been displayed
+      if (this.currentTime >= 59.5 && this.currentTime <= 59.8 && !promptDisplayed) {
+        // Pause the video
+        this.pause();
+
+        // Display the prompt
+        var result = prompt('Is this really what you should be doing right now?', '');
+        if (result === 'Yes') {
+          // Remove the prompt and keep playing the video
+          this.play();
+        } else {
+          // Close the tab
+          window.close();
+        }
+
+        // Set the flag variable to indicate that the prompt has been displayed
+        promptDisplayed = true;
+      }
+    });
+  });
+})();
